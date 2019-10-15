@@ -1,0 +1,14 @@
+C:\Users\taoyu\source\repos\WinReadBook\bin\Debug\WinReadBook.exe.config
+C:\Users\taoyu\source\repos\WinReadBook\bin\Debug\WinReadBook.exe
+C:\Users\taoyu\source\repos\WinReadBook\bin\Debug\WinReadBook.pdb
+C:\Users\taoyu\source\repos\WinReadBook\bin\Debug\log4net.dll
+C:\Users\taoyu\source\repos\WinReadBook\bin\Debug\log4net.xml
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.csprojAssemblyReference.cache
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.Form1.resources
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.Properties.Resources.resources
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.csproj.GenerateResource.cache
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.csproj.CoreCompileInputs.cache
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.csproj.CopyComplete
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.exe
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.pdb
+C:\Users\taoyu\source\repos\WinReadBook\bin\Debug\log4net.config
