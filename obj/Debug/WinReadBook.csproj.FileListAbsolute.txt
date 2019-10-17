@@ -12,3 +12,4 @@ C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.csproj.CopyComplet
 C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.exe
 C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.pdb
 C:\Users\taoyu\source\repos\WinReadBook\bin\Debug\log4net.config
+C:\Users\taoyu\source\repos\WinReadBook\obj\Debug\WinReadBook.Form2.resources
