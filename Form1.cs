@@ -28,28 +28,27 @@ namespace WinReadBook
         public UpdateUI UpdateUIDelegate;
         int processNum = 2;
         string charset = "utf-8";
+        string path1 = "";
         // txt文本输出
         string path = "C://Noval//DownFile//"+DateTime.Now.ToString("yyyy-MM-dd")+"//";//AppDomain.CurrentDomain.BaseDirectory.Replace("\\", "/") + "DownFile/";
         private void Btn_StartRead_Click(object sender, EventArgs e)
         {
+            this.progressBar1.Maximum = 0;
+            this.progressBar1.Value = 0;
+            txtDownDirectry.Text = "";
             string novalurl = txtNameURL.Text;
-            string xsname = txtXsName.Text;
+            string xsname = "我的小说"+DateTime.Now.ToString("yyyyMMddHHmmss");
             processNum = Convert.ToInt32(numericUpDown1.Value);
             if (processNum==0)
             {
                 processNum = 2;
-            }
-            if (string.IsNullOrWhiteSpace(xsname))
-            {
-                Accomplish("小说名不能为空");
-                return;
             }
             if (string.IsNullOrWhiteSpace(novalurl))
             {
                 Accomplish("小说目录路径不能为空");
                 return;
             }
-            string path1 = path+xsname + "//";
+            
             //novalurl = "https://www.ddxsku.com/files/article/html/36/36102/index.html";
             //抓取整本小说
             string html = HttpHelpr.HttpGet(novalurl, "", "1", "utf-8");
@@ -58,10 +57,12 @@ namespace WinReadBook
             {
                 html = HttpHelpr.HttpGet(novalurl, "", "1", charset);
             }
-
+            string title= DownFiles.GetNovelName(html);
+            xsname = string.IsNullOrEmpty(title) ? xsname : title;
             string muluroot = DownFiles.GetMuluRoot(html);
             MatchCollection sMC = DownFiles.GetMulu(muluroot);
             list = DownFiles.RemoteUrlList(sMC);
+            path1 = path + xsname + "//";
             if (list.Count != 0)
             {
                 int taskCount = list.Count;
@@ -79,45 +80,49 @@ namespace WinReadBook
         public void ParallelFunction()
         {
             //多线程方式一：
-            Parallel.ForEach(list,item=>
-            {
-                Thread.Sleep(1);
-                //获取文章标题
-                
-                string title = item.Key.Replace("正文", "").Replace("_", "").Replace(" ", "").Replace("?", "").Replace("*", "").Replace(":", "");
-                //获取文章内容
-                string html_z = HttpHelpr.HttpGet(item.Value, "", "1",charset);
-                // 获取正文
-                Regex reg = new Regex(@"<dd id=""contents"">(.|\n)*?</dd>");
-                var mat = reg.Match(html_z);
-                if (string.IsNullOrEmpty(mat.Groups[0].ToString()))
-                {
-                    reg = new Regex(@"<div id=""content(s?)"">(.|\n)*?</div>");
-                    mat= reg.Match(html_z);
-                }
-                string content = mat.Groups[0].ToString().Replace("<div id=\"content\">","").Replace("</div>", "").Replace("<dd id=\"contents\">", "").Replace("</dd>", "").Replace("&nbsp;", "").Replace("<br />", "\r\n");
-                DownFiles.Novel(DownFiles.Chinese2Num(title) + "\r\n" + content, DownFiles.Chinese2Num(title), path);
-                UpdataUIStatus(1);
-            });
+            //Parallel.ForEach(list,(item,loopState)=>
+            //{
+            //    Thread.Sleep(1);
+            //    //获取文章标题
 
-            ////多线程方式二：
-            //Parallel.For(0, list.Count,
-            //         new ParallelOptions() { MaxDegreeOfParallelism = processNum },
-            //         (i, loopState) =>
-            //         {
+            //    string title = item.Key.Replace("正文", "").Replace("_", "").Replace(" ", "").Replace("?", "").Replace("*", "").Replace(":", "");
+            //    //获取文章内容
+            //    string html_z = HttpHelpr.HttpGet(item.Value, "", "1",charset);
+            //    // 获取正文
+            //    Regex reg = new Regex(@"<dd id=""contents"">(.|\n)*?</dd>");
+            //    var mat = reg.Match(html_z);
+            //    if (string.IsNullOrEmpty(mat.Groups[0].ToString()))
+            //    {
+            //        reg = new Regex(@"<div id=""content(s?)"">(.|\n)*?</div>");
+            //        mat= reg.Match(html_z);
+            //    }
+            //    string content = mat.Groups[0].ToString().Replace("<div id=\"content\">","").Replace("</div>", "").Replace("<dd id=\"contents\">", "").Replace("</dd>", "").Replace("&nbsp;", "").Replace("<br />", "\r\n");
+            //    DownFiles.Novel(DownFiles.Chinese2Num(title) + "\r\n" + content, DownFiles.Chinese2Num(title), path);
+            //    UpdataUIStatus(1);
+            //});
 
-            //             Thread.Sleep(1);
-            //             //获取文章标题
-            //                 string title = sMC1[i].Groups[2].Value.Replace("正文", "").Replace("_", "").Replace(" ", "").Replace("?", "").Replace("*", "").Replace(":","");
-            //                 //获取文章内容
-            //                 string html_z = HttpHelpr.HttpGet(sMC1[i].Groups[1].Value, "", "1");
-            //                 // 获取正文
-            //                 Regex reg = new Regex(@"<dd id=""contents"">(.|\n)*?</dd>");
-            //             var mat = reg.Match(html_z);
-            //             string content = mat.Groups[0].ToString().Replace("<dd id=\"contents\">", "").Replace("</dd>", "").Replace("&nbsp;", "").Replace("<br />", "\r\n");
-            //             DownFiles.Novel(title + "\r\n" + content, title.Replace("两","二"), path);
-            //             UpdataUIStatus(1);
-            //         });
+            //多线程方式二：
+            Parallel.For(0, list.Keys.Count,
+                     new ParallelOptions() { MaxDegreeOfParallelism = processNum },
+                     (i, loopState) =>
+                     {
+                         Thread.Sleep(1);
+                         //获取文章标题
+                         string title = list.Keys.ElementAt(i).Replace("正文", "").Replace("_", "").Replace(" ", "").Replace("?", "").Replace("*", "").Replace(":", "");
+                         //获取文章内容
+                         string html_z = HttpHelpr.HttpGet(list[list.Keys.ElementAt(i)], "", "1", charset);
+                         // 获取正文
+                         Regex reg = new Regex(@"<dd id=""contents"">(.|\n)*?</dd>");
+                         var mat = reg.Match(html_z);
+                         if (string.IsNullOrEmpty(mat.Groups[0].ToString()))
+                         {
+                             reg = new Regex(@"<div id=""content(s?)"">(.|\n)*?</div>");
+                             mat = reg.Match(html_z);
+                         }
+                         string content = mat.Groups[0].ToString().Replace("<div id=\"content\">", "").Replace("</div>", "").Replace("<dd id=\"contents\">", "").Replace("</dd>", "").Replace("&nbsp;", "").Replace("<br />", "\r\n");
+                         DownFiles.Novel(DownFiles.Chinese2Num(title) + "\r\n" + content, DownFiles.Chinese2Num(title), path1);
+                         UpdataUIStatus(1);
+                     });
             Accomplish("任务完成");
         }
         //更新UI

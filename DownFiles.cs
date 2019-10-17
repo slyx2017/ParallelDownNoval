@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -51,7 +52,32 @@ namespace WinReadBook
                 throw;
             }
         }
-
+        /// <summary>
+        /// 获取小说名称
+        /// </summary>
+        /// <param name="html"></param>
+        /// <returns></returns>
+        public static string GetNovelName(string html)
+        {
+            string name="";
+            // 获取小说名字
+            Match ma_name = Regex.Match(html, @"<meta[^>]*?name=""[K|k]eywords"".+content=""(.*?)""*?>");
+            string maname = ma_name.Groups[1].Value;
+            if (string.IsNullOrEmpty(maname))
+            {
+                ma_name = Regex.Match(html, @"<meta[^>]*?content=""(.*?)"".+name=""[K|k]eywords"".*?>");
+                maname = ma_name.Groups[1].Value;
+            }
+            if (maname.Contains(","))
+            {
+                name = maname.Split(',')[0];
+            }
+            if (maname.Contains("，"))
+            {
+                name = maname.Split('，')[0];
+            }
+            return name.Replace("最新章节","");
+        }
         /// <summary>
         /// 提取编码
         /// </summary>
@@ -59,7 +85,8 @@ namespace WinReadBook
         /// <returns></returns>
         public static string GetEncode(string html)
         {
-            string valule;
+            string valule;//
+            html = Regex.Match(html, "<meta[^>]*?charset=([\"\']?)([a-zA-z0-9\\-]+)(\\1)[^>]*?>").Value.ToString();
             // 获取编码
             Match ma_chartset = Regex.Match(html, @"<meta http-equiv=""[C|c]ontent-[T|t]ype"".+content=""(.+)"".*/>");
             if (string.IsNullOrWhiteSpace(ma_chartset.Value))
@@ -98,6 +125,7 @@ namespace WinReadBook
         /// <returns></returns>
         public static MatchCollection GetMulu(string muluRoot)
         {
+            muluRoot = muluRoot.Replace("'", "\"");
             // 匹配a标签里面的url 
             Regex hreflist = new Regex("<a[^>]+?href.?=\"([^\"]+)\"[^>]*>([^<]+)</a>", RegexOptions.Compiled);
             MatchCollection sMC = hreflist.Matches(muluRoot);
@@ -134,12 +162,13 @@ namespace WinReadBook
             for (int i = 0; i < rootMC.Count; i++)
             {
                 string hreflist = rootMC[i].Value.ToString();
-                if (Regex.Matches(hreflist, @"\.htm").Count > 100)
+                if (Regex.Matches(hreflist, @"\.htm").Count > 100 || Regex.Matches(hreflist, @"\.aspx").Count > 100)
                 {
                     muluroot = hreflist;
                     break;
                 }
             }
+
             return muluroot;
         }
         /// <summary>
@@ -162,9 +191,11 @@ namespace WinReadBook
                     href = HttpHelpr.Host + list[i].Groups[1].Value;
                 }
                 string name = list[i].Groups[2].Value;
-                dic.Add(name, href);
+                if (!dic.ContainsKey(name))
+                {
+                    dic.Add(name, href);
+                }
             }
-
             return dic;
         }
 
