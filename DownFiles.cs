@@ -188,7 +188,14 @@ namespace WinReadBook
                 }
                 else
                 {
-                    href = HttpHelpr.Host + list[i].Groups[1].Value;
+                    if (!list[i].Groups[1].Value.StartsWith("/"))
+                    {
+                        href = HttpHelpr.Host +"/"+ list[i].Groups[1].Value;
+                    }
+                    else
+                    {
+                        href = HttpHelpr.Host + list[i].Groups[1].Value;
+                    }
                 }
                 string name = list[i].Groups[2].Value;
                 if (!dic.ContainsKey(name))
@@ -229,7 +236,7 @@ namespace WinReadBook
                 }
             }
             string cnword = FileterChineseNum(word);
-            targetword = DownFiles.Convert2Number(cnword).ToString();
+            targetword = Convert2Number(cnword).ToString();
             return "第" + targetword + "章 " + titlename;
         }
         /// <summary>
@@ -241,6 +248,7 @@ namespace WinReadBook
         {
             string cnword;
             Match ma_word = Regex.Match(word, @"[第|\s](.*)[章|\s]");
+            string temp = "" ;
             if (!string.IsNullOrEmpty(ma_word.Groups[1].Value))
             {
                 cnword = ma_word.Groups[1].Value.ToString().Replace("第", "").Replace("章", "");
@@ -253,10 +261,42 @@ namespace WinReadBook
                 }
                 else
                 {
-                    cnword = word.Replace("第", "").Replace("章", "");
+                    temp = word;
+                    if (temp.StartsWith("第"))
+                    {
+                        temp = temp.Replace("第","");
+                    }
+                    if (temp.Contains("章"))
+                    {
+                        temp = temp.Replace("章","");
+                    }
+                    temp = temp.Replace("一",
+                    "").Replace("二",
+                    "").Replace("三",
+                    "").Replace("四",
+                    "").Replace("五",
+                    "").Replace("六",
+                    "").Replace("七",
+                    "").Replace("八",
+                    "").Replace("九",
+                    "").Replace("零",
+                    "").Replace("〇",
+                    "").Replace("两",
+                    "").Replace("百",
+                    "").Replace("千",
+                    "");
+                    if (temp.Length>0)
+                    {
+                        cnword = "0";
+                    }
+                    else
+                    {
+                        cnword = word.Replace("第", "").Replace("章", "");
+                    }
+                    
                 }
             }
-            return cnword;
+            return cnword.Replace("两", "二");
         }
         /// <summary>
         /// 1万以内中文转数字

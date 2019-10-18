@@ -20,8 +20,6 @@ namespace WinReadBook
             InitializeComponent();
             log4net.Config.XmlConfigurator.Configure();
         }
-
-        //MatchCollection sMC1;
         Dictionary<string, string> list=null;
         public delegate void AsynUpdateUI(int step);
         public delegate void UpdateUI(int step);//声明一个更新主线程的委托
