@@ -207,6 +207,25 @@ namespace WinReadBook
         }
 
         /// <summary>
+        /// 内容html
+        /// </summary>
+        /// <param name="html_z">html</param>
+        public static string FindContent(string html_z)
+        {
+            // 获取正文
+            Regex reg = new Regex(@"<dd id=""contents"">(.|\n)*?</dd>");
+            var mat = reg.Match(html_z);
+            if (string.IsNullOrEmpty(mat.Groups[0].ToString()))
+            {
+                reg = new Regex(@"<div id=""content(s?)"">(.|\n)*?</div>");
+                mat = reg.Match(html_z);
+            }
+            string content = mat.Groups[0].ToString().Replace("<div id=\"content\">", "").Replace("</div>", "").Replace("<dd id=\"contents\">", "").Replace("</dd>", "").Replace("&nbsp;", "").Replace("<br />", "\r\n");
+            return content;
+        }
+
+
+        /// <summary>
         /// 中文数字转纯数字
         /// </summary>
         /// <param name="word">word</param>

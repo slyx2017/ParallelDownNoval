@@ -31,6 +31,10 @@ namespace WinReadBook
         string path = "C://Noval//DownFile//"+DateTime.Now.ToString("yyyy-MM-dd")+"//";//AppDomain.CurrentDomain.BaseDirectory.Replace("\\", "/") + "DownFile/";
         private void Btn_StartRead_Click(object sender, EventArgs e)
         {
+            //string str = "第二四零 这里我有些熟悉";
+            //string msg=DownFiles.Chinese2Num(str);
+            //MessageBox.Show(msg);
+            //return;
             this.progressBar1.Maximum = 0;
             this.progressBar1.Value = 0;
             txtDownDirectry.Text = "";
@@ -105,20 +109,16 @@ namespace WinReadBook
                      (i, loopState) =>
                      {
                          Thread.Sleep(1);
+                         
                          //获取文章标题
-                         string title = list.Keys.ElementAt(i).Replace("正文", "").Replace("_", "").Replace(" ", "").Replace("?", "").Replace("*", "").Replace(":", "");
+                         string title = list.Keys.ElementAt(i).Replace("正文", "").Replace("_", "").Replace("?", "").Replace("*", "").Replace(":", "");
                          //获取文章内容
                          string html_z = HttpHelpr.HttpGet(list[list.Keys.ElementAt(i)], "", "1", charset);
                          // 获取正文
-                         Regex reg = new Regex(@"<dd id=""contents"">(.|\n)*?</dd>");
-                         var mat = reg.Match(html_z);
-                         if (string.IsNullOrEmpty(mat.Groups[0].ToString()))
-                         {
-                             reg = new Regex(@"<div id=""content(s?)"">(.|\n)*?</div>");
-                             mat = reg.Match(html_z);
-                         }
-                         string content = mat.Groups[0].ToString().Replace("<div id=\"content\">", "").Replace("</div>", "").Replace("<dd id=\"contents\">", "").Replace("</dd>", "").Replace("&nbsp;", "").Replace("<br />", "\r\n");
-                         DownFiles.Novel(DownFiles.Chinese2Num(title) + "\r\n" + content, DownFiles.Chinese2Num(title), path1);
+                         string content=DownFiles.FindContent(html_z);
+                         // 获取章节序号
+                         string chartname = DownFiles.Chinese2Num(title);
+                         DownFiles.Novel(chartname + "\r\n" + content, chartname, path1);
                          UpdataUIStatus(1);
                      });
             Accomplish("任务完成");
